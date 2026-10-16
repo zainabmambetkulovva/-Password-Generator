@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator - Генератор Паролей</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔐 Password Generator</h1>
+            <p class="subtitle">Безопасный генератор паролей с использованием Web Crypto API</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Секция генератора -->
+            <section class="generator-section">
+                <div class="password-display">
+                    <input 
+                        type="text" 
+                        id="passwordOutput" 
+                        class="password-output" 
+                        readonly 
+                        placeholder="Сгенерированный пароль появится здесь..."
+                    >
+                    <button id="copyBtn" class="btn-icon" title="Копировать в буфер обмена" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Индикатор силы пароля -->
+                <div class="strength-indicator">
+                    <div class="strength-label">
+                        <span>Сложность пароля:</span>
+                        <span id="strengthText" class="strength-text">-</span>
+                    </div>
+                    <div class="strength-bar">
+                        <div id="strengthBar" class="strength-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Настройки длины -->
+                <div class="settings-group">
+                    <label class="setting-label">
+                        <span>Длина пароля: <strong id="lengthValue">16</strong></span>
+                    </label>
+                    <input 
+                        type="range" 
+                        id="lengthSlider" 
+                        class="slider" 
+                        min="8" 
+                        max="64" 
+                        value="16"
+                    >
+                    <div class="slider-labels">
+                        <span>8</span>
+                        <span>64</span>
+                    </div>
+                </div>
+
+                <!-- Настройки символов -->
+                <div class="settings-group">
+                    <h3 class="settings-title">Использовать символы:</h3>
+                    
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="uppercaseCheck" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>Заглавные буквы (A-Z)</span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="lowercaseCheck" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>Строчные буквы (a-z)</span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="numbersCheck" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>Цифры (0-9)</span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="symbolsCheck" checked>
+                        <span class="checkbox-custom"></span>
+                        <span>Специальные символы (!@#$%^&*...)</span>
+                    </label>
+                </div>
+
+                <!-- Кнопка генерации -->
+                <button id="generateBtn" class="btn-generate">
+                    Сгенерировать пароль
+                </button>
+
+                <!-- Сообщения -->
+                <div id="messageBox" class="message-box hidden"></div>
+            </section>
+
+            <!-- Секция статистики -->
+            <section class="stats-section">
+                <h2 class="section-title">📊 Статистика</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Паролей сгенерировано</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAvgLength">0</div>
+                        <div class="stat-label">Средняя длина</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAvgStrength">0</div>
+                        <div class="stat-label">Средняя сложность</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция истории -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2 class="section-title">📜 История генерации</h2>
+                    <button id="refreshHistoryBtn" class="btn-secondary">Обновить</button>
+                </div>
+                <div id="historyList" class="history-list">
+                    <p class="empty-message">История пуста</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>🔒 Пароли генерируются локально и не сохраняются на сервере</p>
+            <p>Используется Web Crypto API для безопасной генерации</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
