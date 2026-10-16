@@ -90,22 +90,8 @@ npm install
 - `dotenv` — переменные окружения
 - `better-sqlite3` — SQLite драйвер
 
-### Шаг 3: Настройка окружения
+### Шаг 3: Настройка окружени
 
-Создайте файл `.env` на основе `.env.example`:
-
-```bash
-copy .env.example .env
-```
-
-Содержимое `.env`:
-```env
-PORT=3000
-NODE_ENV=development
-DATABASE_PATH=./database/passwords.db
-```
-
-Вы можете изменить порт, если 3000 уже занят.
 
 ### Шаг 4: Инициализация базы данных
 
