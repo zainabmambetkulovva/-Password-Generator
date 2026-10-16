@@ -1,12 +1,22 @@
-const Database = require('better-sqlite3');
+const initSqlJs = require('sql.js');
+const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
 const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'passwords.db');
 
 // Создаем и инициализируем базу данных
-function initDatabase() {
-  const db = new Database(dbPath);
+async function initDatabase() {
+  const SQL = await initSqlJs();
+  
+  let db;
+  // Проверяем, существует ли файл базы данных
+  if (fs.existsSync(dbPath)) {
+    const filebuffer = fs.readFileSync(dbPath);
+    db = new SQL.Database(filebuffer);
+  } else {
+    db = new SQL.Database();
+  }
   
   // Создаем таблицу для хранения истории генерации паролей
   const createTableQuery = `
@@ -23,16 +33,24 @@ function initDatabase() {
     )
   `;
   
-  db.exec(createTableQuery);
+  db.run(createTableQuery);
+  
+  // Сохраняем базу данных в файл
+  const data = db.export();
+  const buffer = Buffer.from(data);
+  fs.writeFileSync(dbPath, buffer);
+  
+  db.close();
   
   console.log('✅ База данных успешно инициализирована');
   console.log(`📁 Путь к базе данных: ${dbPath}`);
-  
-  db.close();
 }
 
 if (require.main === module) {
-  initDatabase();
+  initDatabase().catch(err => {
+    console.error('Ошибка инициализации базы данных:', err);
+    process.exit(1);
+  });
 }
 
 module.exports = { initDatabase };

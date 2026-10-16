@@ -6,6 +6,26 @@ const router = express.Router();
 const passwordService = new PasswordService();
 const dbService = new DatabaseService();
 
+// Инициализация базы данных
+let dbReady = false;
+dbService.init().then(() => {
+  dbReady = true;
+  console.log('✅ DatabaseService готов к работе');
+}).catch(err => {
+  console.error('❌ Ошибка инициализации DatabaseService:', err);
+});
+
+// Middleware для проверки готовности БД
+function checkDbReady(req, res, next) {
+  if (!dbReady) {
+    return res.status(503).json({
+      success: false,
+      error: 'База данных еще не готова, попробуйте снова через несколько секунд'
+    });
+  }
+  next();
+}
+
 // Middleware для валидации
 function validateGenerateRequest(req, res, next) {
   const { length, uppercase, lowercase, numbers, symbols } = req.body;
@@ -33,7 +53,7 @@ function validateGenerateRequest(req, res, next) {
 }
 
 // POST /api/generate - Генерация нового пароля
-router.post('/generate', validateGenerateRequest, (req, res) => {
+router.post('/generate', checkDbReady, validateGenerateRequest, (req, res) => {
   try {
     const options = {
       length: parseInt(req.body.length) || 16,
@@ -80,7 +100,7 @@ router.post('/generate', validateGenerateRequest, (req, res) => {
 });
 
 // GET /api/history - Получение истории генерации
-router.get('/history', (req, res) => {
+router.get('/history', checkDbReady, (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 50;
     const history = dbService.getPasswordHistory(limit);
@@ -108,7 +128,7 @@ router.get('/history', (req, res) => {
 });
 
 // GET /api/statistics - Получение статистики
-router.get('/statistics', (req, res) => {
+router.get('/statistics', checkDbReady, (req, res) => {
   try {
     const stats = dbService.getStatistics();
 
@@ -132,7 +152,7 @@ router.get('/statistics', (req, res) => {
 });
 
 // DELETE /api/history/cleanup - Очистка старых записей
-router.delete('/history/cleanup', (req, res) => {
+router.delete('/history/cleanup', checkDbReady, (req, res) => {
   try {
     const result = dbService.cleanOldRecords();
 
@@ -157,6 +177,7 @@ router.get('/health', (req, res) => {
     success: true,
     data: {
       status: 'ok',
+      dbReady: dbReady,
       timestamp: new Date().toISOString()
     }
   });
